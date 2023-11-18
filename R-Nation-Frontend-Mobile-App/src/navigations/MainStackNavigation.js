@@ -1,5 +1,5 @@
 import { createStackNavigator } from '@react-navigation/stack';
-// import Homepage from '../components/Homepage';
+import Homepage from '../components/Homepage';
 // import Profile from '../components/Profile';
 // import  { DreamsMainTabNavigation, SharedDreamsTabNavigations, FriendsTabNavigations, DictionaryTabNavigations, AdminTabNavigation } from './MainTabNavigation';
 // import FeatureRequest from '../reuseableComponents/FeatureRequest';

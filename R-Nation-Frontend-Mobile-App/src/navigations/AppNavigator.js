@@ -39,7 +39,7 @@ const AppNavigator = (props) => {
   useEffect(() => {
     const fetchData = async () => {
       // try {
-        await AsyncStorage.removeItem('authToken')
+        // await AsyncStorage.removeItem('authToken')
         const token = await AsyncStorage.getItem('authToken');
         const userProfileJsonObject = await JSON.parse(token);
         if (token === null) {

@@ -15,8 +15,8 @@ import EnableNotification from '../../reusesableComponents/EnableNotification';
 
 const Login = ({ navigation }) => {
   const ipAddress = getIpAddress();
-  const [username, setUsername] = useState('agentofgod')
-  const [password, setPassword] = useState('StevensonGerard')
+  const [username, setUsername] = useState('cisco')
+  const [password, setPassword] = useState('cisco')
   const [expoPushToken, setExpoPushToken] = useState('')
   const [showPassword, setShowPassword] = useState(false);
   const [isLoggedIn, setIsLoggedIn] = useContext(ProfileInfoSaved);
@@ -40,28 +40,38 @@ const Login = ({ navigation }) => {
     await AsyncStorage.setItem('authToken', token);
     const userProfileJsonObject = JSON.parse(token);
     setProfileInfo(userProfileJsonObject)
-  } catch (error) {
+    return (200)
+  }catch (error) {
+    return (500)
   }
   };
   const postApiResponse = async () => {
       try {  
           const pushTokenData = {username:username, deviceMake:Device.brand, deviceModel:Device.modelName, token:expoPushToken}
-          const postApiCall = await axios.post(`${ipAddress}/users/login_verification`,{username:username, password:password})
-          console.log(postApiCall.status)
+          const postApiCall = await axios.post(`${ipAddress}/login_verification`,{username:username, password:password})
+          // backend sends an array of object
           if (!postApiCall.status === 200){
             Alert.alert('❌', 'Username and/or password is invalid. Please try again.')
           }
-          const apiResponseEncode = await JSON.stringify(postApiCall.data)
-          saveAuthToken(apiResponseEncode)
-          const pushTokenApiCall = await axios.post(`${ipAddress}/save_push_token`,pushTokenData)
-          const activeUser = postApiCall.data['active'] === 'true'
-          const activeToken = pushTokenApiCall.data === 'successful'
-          if (activeUser || activeToken) {
-              setIsLoggedIn(true)
-              navigation.navigate('Homepage')
-          }else{
+          else{
+            const apiResponseEncode = await JSON.stringify(postApiCall.data)
+            // returns an array of object, when find the first index
+            const passAuthToken = await saveAuthToken(apiResponseEncode)
+            if (passAuthToken === 500) {
+              // if passAuthToken returns a 500 and couldn't process
               Alert.alert('❌', 'Username and/or password is invalid. Please try again.')
-              }
+            } else{
+              const pushTokenApiCall = await axios.post(`${ipAddress}/save_push_token`,pushTokenData)
+              const activeUser = postApiCall.data['active'] === true
+              const activeToken = pushTokenApiCall.data === 'successful'
+              if (activeUser || activeToken) {
+                  setIsLoggedIn(true)
+                  navigation.navigate('Homepage')
+              }else{
+                  Alert.alert('❌', 'Username and/or password is invalid. Please try again.')
+                  }
+            }
+          }
       }
       catch (err) {
           console.log(err)

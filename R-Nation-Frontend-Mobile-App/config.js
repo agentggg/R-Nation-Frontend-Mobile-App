@@ -2,8 +2,8 @@ import * as Device from 'expo-device';
 
 const ipAddress = {
   // physicalDevice: 'https://dreamers-agentofgod.pythonanywhere.com',
-  physicalDevice: 'http://localhost:3001',
-  simulator: 'http://localhost:3001'
+  physicalDevice: 'http://10.0.0.211:8000',
+  simulator: 'http://10.0.0.211:8000'
   // simulator: 'https://dreamers-agentofgod.pythonanywhere.com'
 }
 

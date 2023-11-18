@@ -1,161 +1,103 @@
-// import React, { useState } from 'react';
-// import {
-//   TouchableOpacity,
-//   StyleSheet,
-//   Animated,
-//   Easing,
-//   SafeAreaView,
-//   Image,
-// } from 'react-native';
-// import SocialMediaIcons from '../reusesableComponents/SocialMediaIcons'
+import React, { useEffect, useState } from 'react';
+import { StyleSheet, View, Text, ActivityIndicator, Image, Dimensions, StatusBar } from 'react-native';
+import PagerView from 'react-native-pager-view';
+import axios from 'axios';
+import getIpAddress from '../../config';
+import * as Font from 'expo-font';
+import { SafeAreaView } from 'react-native-safe-area-context';
 
-// const Homepage = () => {
-//   const [partner] = useState(false)
-//   const [scaleValue] = useState(new Animated.Value(1));
-//   const buttons = [
-//     {
-//       text: 'Announcements',
-//       color: '#000',
-//       isLong: true,
-//       imageSource: require('../../assets/homepage/announcements.png'),
-//       boxBackground: '#FFF',
-//       resizeMode: 'contain'
-//     },
-//     {
-//       text: 'Events',
-//       color: '#800020',
-//       imageSource: require('../../assets/homepage/events.png'),
-//       boxBackground: '#e9e8e9',
-//     },
-//     {
-//       text: 'Podcast',
-//       color: '#800020',
-//       imageSource: require('../../assets/homepage/podcast.png'),
-//       boxBackground: '#FFF',
-//     },
-//     {
-//       text: 'Capturing the Moments',
-//       color: '#000',
-//       isLong: true,
-//       imageSource: require('../../assets/homepage/capturingthemoments.png'),
-//       boxBackground: '#FFF',
-//       resizeMode: 'contain'
-//     },
-//     {
-//       text: 'RAW Studios',
-//       color: '#800020',
-//       imageSource: require('../../assets/homepage/2535.png'),
-//       boxBackground: '#000',
-//       resizeMode: 'contain'
-//     },
-//     {
-//       text: 'Forum',
-//       color: '#800020',
-//       imageSource: require('../../assets/homepage/forum.png'),
-//       boxBackground: '#000',
-//     },
-//   ];
+const Homepage = () => {
+  StatusBar.setHidden(true);
+  const ipAddress = getIpAddress();
+  const [images, setImages] = useState([]);
+  const [loading, setLoading] = useState(true);
+
+  const { width, height } = Dimensions.get('window');
+
+  useEffect(() => {
+    async function loadFonts() {
+      await Font.loadAsync({
+        'monoline-script': require('../../assets/fonts/PaytoneOne-Regular.ttf'),
+      });
+    }
+
+    loadFonts();
+  }, []);
 
 
-//   if (partner) {
-//     buttons.unshift({
-//       text: 'Announcements',
-//       color: '#000',
-//       isLong: true,
-//       imageSource: require('../../assets/homepage/announcements.png'),
-//       boxBackground: '#000',
-//       resizeMode: 'fill',
-//     });
-//   }
+  useEffect(() => {
+    const retrieveImages = async () => {
+      const djangoImageUrl = `${ipAddress}/get_images`;
+      try {
+        const response = await axios.get(djangoImageUrl);
+        if (response.status === 200) {
+          const imageData = response.data.images;
+          setImages(imageData);
+          setLoading(false);
+        } else {
+          console.error('Failed to fetch images:', response.status, response.statusText);
+          setLoading(false);
+        }
+      } catch (error) {
+        console.error('Error fetching images:', error.message);
+        setLoading(false);
+      }
+    };
 
-//   const startAnimation = (index) => {
-//     Animated.timing(scaleValue, {
-//       toValue: 1.2,
-//       duration: 1000,
-//       easing: Easing.linear,
-//       useNativeDriver: false,
-//     }).start(() => {
-//       scaleValue.setValue(1);
-//     });
-//   };
+    retrieveImages()
+  }, []);
 
-//   return (
-//     <SafeAreaView style={styles.container}>
-//       {buttons.map((button, index) => (
-//         <TouchableOpacity
-//           key={index}
-//           style={[
-//             styles.widget,
-//             {
-//               backgroundColor: button.color,
-//               borderRadius: '25%',
-//               shadowColor: '#000',
-//               shadowOffset: {
-//                 width: 0,
-//                 height: 4,
-//               },
-//               shadowOpacity: 0.5,
-//               shadowRadius: 5,
-//               elevation: 5,
-//             },
-//             button.isLong && styles.longWidget,
-//           ]}
-//           onPress={() => startAnimation(index)}
-//         >
-//           <Image
-//             source={button.imageSource}
-//             style={[styles.buttonBackground, { backgroundColor: button.boxBackground }]}
-//             resizeMode={button.resizeMode}
-//           />
-//           <Animated.Text
-//             style={[
-//               styles.widgetText,
-//               {
-//                 transform: [{ scale: scaleValue }],
-//               },
-//             ]}
-//           >
-//             {button.text}
-//           </Animated.Text>
-//         </TouchableOpacity>
-//       ))}
-//       <SocialMediaIcons />
-//     </SafeAreaView>
-//   );
-// };
+  if (loading) {
+    return (
+      <View style={styles.alertContainer}>
+        <ActivityIndicator size="large" color="red" />
+        <Text style={styles.alert}>Fetching images 📷</Text>
+      </View>
+    );
+  }
 
-// const styles = StyleSheet.create({
-//   container: {
-//     flex: 1,
-//     flexDirection: 'row',
-//     flexWrap: 'wrap',
-//     justifyContent: 'center',
-//     alignItems: 'center',
-//     marginTop: '25%',
-//     borderWidth: 3,
-//     borderRadius: '20%',
-//   },
-//   widget: {
-//     width: '44%',
-//     height: 150,
-//     margin: 10,
-//     justifyContent: 'center',
-//     alignItems: 'center',
-//   },
-//   longWidget: {
-//     width: '80%',
-//   },
-//   widgetText: {
-//     color: 'white',
-//     fontSize: 18,
-//     fontWeight: 'bold',
-//   },
-//   buttonBackground: {
-//     flex: 1,
-//     width: '100%',
-//     height: '100%',
-//     borderRadius: 24
-//   },
-// });
+  return (
+    <SafeAreaView style={{ flex: 1, backgroundColor: '#000' }}>
+      <PagerView style={[styles.viewPager, { flex: 1 / 3 }]} initialPage={0}>
+        {images.map((imageData, index) => (
+          <View style={styles.page} key={index}>
+            <Image
+              source={{ uri: `data:${imageData.content_type};base64,${imageData.data.toString('base64')}` }}
+              style={{ width: width, height: height, aspectRatio: 0.6 }}
+              resizeMode="contain"
+            />
+          </View>
+        ))}
+      </PagerView>
+      <View style={{ alignItems: 'center', marginBottom: 40}}>
+        <Text  style={{ fontSize: width / 11, color: '#FFF', fontFamily: 'monoline-script'}}>Featured Events</Text>
+      </View>
+    </SafeAreaView>    
+  );
+};
 
-// export default Homepage;
+const styles = StyleSheet.create({
+  viewPager: {},
+  page: {
+    justifyContent: 'center',
+    alignItems: 'center',
+    borderRadius: 40,
+    overflow: 'hidden'
+  },
+  alert: {
+    fontSize: 40,
+    alignSelf: 'center',
+    justifyContent: 'center',
+    textAlign: 'center',
+    marginTop: 40,
+  },
+  alertContainer: {
+    flexDirection: 'column',
+    flex: 1,
+    justifyContent: 'center',
+    alignContent: 'center',
+    padding: 3,
+  },
+});
+
+export default Homepage;

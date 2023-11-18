@@ -1,7 +1,7 @@
 {
   "expo": {
     "name": "R-Nation",
-    "slug": "R-Nation",
+    "slug": "rnation",
     "version": "1.0.0",
     "orientation": "portrait",
     "icon": "./assets/icon.png",
@@ -26,6 +26,12 @@
     },
     "web": {
       "favicon": "./assets/favicon.png"
-    }
+    },
+    "extra": {
+      "eas": {
+        "projectId": "dc8f874c-7a25-4780-ad0f-72b15d766912"
+      }
+    },
+    "owner": "agentgg"
   }
 }
